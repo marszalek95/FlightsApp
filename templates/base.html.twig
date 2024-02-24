@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <title>{% block title %}FlightsApp{% endblock %}</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}
@@ -11,8 +11,31 @@
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
         {% endblock %}
+
+        <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
     </head>
     <body>
+        {% block nav %}
+
+        <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+            <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">FlightsApp</a>
+            <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-nav">
+                <div class="nav-item text-nowrap">
+                {% if app.user %}
+                    <a class="nav-link px-3" href="/logout">Sign out</a>
+                {% else %}
+                    <a class="nav-link px-3" href="/login">Sign in</a>
+                {% endif %}
+                </div>
+            </div>
+        </header>
+
+        {% endblock %}
+
         {% block body %}{% endblock %}
+
     </body>
 </html>
