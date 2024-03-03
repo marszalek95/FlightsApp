@@ -2,8 +2,102 @@
 
 {% block title %}Add new flight!{% endblock %}
 
+{% block head %}
+    {{ parent() }}
+
+    {% if data %}
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js'></script>
+      
+    <script>
+
+      document.addEventListener('DOMContentLoaded', function() {
+        var events = {{ data|raw }};
+        var calendarEl = document.getElementById('calendarDepart');
+        var calendar = new FullCalendar.Calendar(calendarEl, {    
+            events: events,
+            height: 500      
+        });
+        calendar.render();
+      });
+
+        document.addEventListener('DOMContentLoaded', function() {
+        var events = {{ data|raw }};
+        var calendarEl = document.getElementById('calendarReturn');
+        var calendar = new FullCalendar.Calendar(calendarEl, {    
+            events: events,
+            height: 500         
+        });
+        calendar.render();
+      });
+
+    </script>
+    {% endif %}
+
+
+  
+
+{% endblock %}
+
 {% block body %}
 
-{% include 'sidebar.html.twig' %}
+
+
+  {# [{"title": "269złhehe", "start": "2024-02-26"},{"title": "9:30 - 11:30", "start": "2024-02-26"}]; #}
+
+<div class="container-fluid mt-2">
+  <div class="row">
+    {% include 'sidebar.html.twig' %}
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <div class="row">
+      {{ form_start(form) }}
+        <div class="col-md-4 mb-4">
+          <h4>Flight Search</h1>
+            <div class="input-group">                     
+                {{ form_widget(form.departure) }}       
+                  <button class="btn btn-outline-secondary" type="button" id="swapButton">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-right" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5m14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5"/>
+                    </svg>
+                  </button>               
+                {{ form_widget(form.destination) }}              
+                {{ form_row(form.search) }}                
+            </div>
+        </div>
+      {{ form_end(form) }}
+      </div>
+      {% if data %}
+      <div class="row">
+        {{ dump(data) }}
+        {{ dump(obj) }}
+        
+          <!-- First Column (col-md-8 for medium and larger screens) -->
+          <div class="col-md-4">
+            <h4> Depatrute </h1>
+            <div id='calendarDepart'></div>
+          </div>
+          <!-- Second Column (col-md-4 for medium and larger screens) -->
+          <div class="col-md-4">
+            <h4> Return </h1>
+            <div id='calendarReturn'></div>
+          </div>
+
+          
+      {% endif %}      
+      </div>
+    </main>
+  </div> 
+</div>
+
+<script>
+      // Example JavaScript to handle swap button click
+      document.getElementById('swapButton').addEventListener('click', function () {
+      var departureValue = document.getElementById('search_form_departure').value;
+      var destinationValue = document.getElementById('search_form_destination').value;
+
+      document.getElementById('search_form_departure').value = destinationValue;
+      document.getElementById('search_form_destination').value = departureValue;
+  });
+</script>
+
 
 {% endblock %}
