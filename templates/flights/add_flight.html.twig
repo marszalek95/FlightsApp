@@ -5,32 +5,42 @@
 {% block head %}
     {{ parent() }}
 
-    {% if data %}
+    {% if data_departure %}
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js'></script>
       
     <script>
 
-      document.addEventListener('DOMContentLoaded', function() {
-        var events = {{ data|raw }};
-        var calendarEl = document.getElementById('calendarDepart');
-        var calendar = new FullCalendar.Calendar(calendarEl, {    
-            events: events,
-            height: 500      
+    document.addEventListener('DOMContentLoaded', function() {
+      var events = {{ data_departure|raw }};
+      var calendarEl = document.getElementById('calendarDepart');
+      var calendar = new FullCalendar.Calendar(calendarEl, {    
+          events: events,
+          eventOrder: "eventProperty",
+          height: 550,
+          themeSystem: 'bootstrap5',
+          eventBackgroundColor: '#2c3e50',
         });
         calendar.render();
-      });
+    });
 
-        document.addEventListener('DOMContentLoaded', function() {
-        var events = {{ data|raw }};
-        var calendarEl = document.getElementById('calendarReturn');
-        var calendar = new FullCalendar.Calendar(calendarEl, {    
-            events: events,
-            height: 500         
+
+
+    {% if type == 'return' %}
+    document.addEventListener('DOMContentLoaded', function() {
+      var events = {{ data_return|raw }};
+      var calendarEl = document.getElementById('calendarReturn');
+      var calendar = new FullCalendar.Calendar(calendarEl, {    
+          events: events,
+          eventOrder: "eventProperty",
+          height: 550,
+          themeSystem: 'bootstrap5',
+          eventBackgroundColor: '#2c3e50',
         });
         calendar.render();
-      });
-
+    });
+    {% endif %}
     </script>
+    
     {% endif %}
 
 
@@ -45,14 +55,13 @@
   {# [{"title": "269złhehe", "start": "2024-02-26"},{"title": "9:30 - 11:30", "start": "2024-02-26"}]; #}
 
 <div class="container-fluid mt-2">
-  <div class="row">
     {% include 'sidebar.html.twig' %}
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <h4>Flight Search</h1>
       <div class="row">
-      {{ form_start(form) }}
-        <div class="col-md-4 mb-4">
-          <h4>Flight Search</h1>
-            <div class="input-group">                     
+        <div class="col-md-4">
+            {{ form_start(form) }}   
+            <div class="input-group">
                 {{ form_widget(form.departure) }}       
                   <button class="btn btn-outline-secondary" type="button" id="swapButton">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-right" viewBox="0 0 16 16">
@@ -60,32 +69,55 @@
                     </svg>
                   </button>               
                 {{ form_widget(form.destination) }}              
-                {{ form_row(form.search) }}                
+                {{ form_widget(form.search) }}  
             </div>
+            <div>
+              <div class="form-check form-check-inline">
+                {{ form_widget(form.type.0) }}
+                {{ form_label(form.type.0) }}
+              </div>
+              <div class="form-check form-check-inline">
+                {{ form_widget(form.type.1) }}
+                {{ form_label(form.type.1) }}              
+              </div>
+            </div>
+            {{ form_end(form) }}
+            
         </div>
-      {{ form_end(form) }}
+            <div class="col-md-4">
+              <div class="input-group">
+                <span class="input-group-text">Departure</span>
+                <input type="text" id="departureDate" class="form-control" readonly>
+                {% if type == 'return' %}
+                <span class="input-group-text">Return</span>
+                <input type="text" id="returnDate" class="form-control" readonly>
+                {% endif %}
+                <button class="btn btn-primary" id="addFlightBtn">Add Flight</button>
+              </div>
+            </div>
+          
       </div>
-      {% if data %}
-      <div class="row">
-        {{ dump(data) }}
-        {{ dump(obj) }}
-        
-          <!-- First Column (col-md-8 for medium and larger screens) -->
+      
+      
+      
+      {% if data_departure %}
+      <div class="row">       
+          <!-- First Column (col-md-4 for medium and larger screens) -->
           <div class="col-md-4">
             <h4> Depatrute </h1>
             <div id='calendarDepart'></div>
           </div>
+          {% if type == 'return' %}
           <!-- Second Column (col-md-4 for medium and larger screens) -->
-          <div class="col-md-4">
+           <div class="col-md-4">
             <h4> Return </h1>
             <div id='calendarReturn'></div>
           </div>
+          {% endif %}
 
-          
       {% endif %}      
       </div>
     </main>
-  </div> 
 </div>
 
 <script>

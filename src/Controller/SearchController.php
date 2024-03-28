@@ -20,19 +20,16 @@ class SearchController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            
-
-            if ($form->isSubmitted() && $form->isValid()) {
-                
-                $departure = $form->getData()['departure'];
-                $destination = $form->getData()['destination'];
-                return $this->redirect("/addflight/search/{$departure}/{$destination}");
-            }
-    }
+            $type = $form->getData()['type'];
+            $departure = $form->getData()['departure'];
+            $destination = $form->getData()['destination'];   
+            return $this->redirect("/addflight/search/{$departure}/{$destination}/{$type}");
+        }
 
         return $this->render('flights/add_flight.html.twig', [
             'form' => $form->createView(),
-            'data' => null,
+            'data_departure' => null,
+            'type' => null,
         ]);
     }
 }
