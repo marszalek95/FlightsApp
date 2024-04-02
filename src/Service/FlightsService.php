@@ -12,7 +12,7 @@ class FlightsService extends AbstractController
 
     public function searchFlight($departure, $destination)
     {   
-        $currentDate = new DateTime('now');
+        $currentDate = new DateTime('first day of this month');
 
         // Loop through the next 12 months
         for ($i = 0; $i < 12; $i++) {

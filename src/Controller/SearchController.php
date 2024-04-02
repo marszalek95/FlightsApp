@@ -7,7 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpClient\HttpClient;
+
 
 
 class SearchController extends AbstractController
@@ -27,7 +27,7 @@ class SearchController extends AbstractController
         }
 
         return $this->render('flights/add_flight.html.twig', [
-            'form' => $form->createView(),
+            'form' => $form,
             'data_departure' => null,
             'type' => null,
         ]);
