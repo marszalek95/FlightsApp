@@ -63,6 +63,36 @@ class FlightsService extends AbstractController
          
     }
 
+    public function getAirports() 
+    {
+        $apiUrl = 'https://www.ryanair.com/api/views/locate/3/airports/en/active';
+        $httpClient = HttpClient::create();
+        $response = $httpClient->request('GET', $apiUrl);
+        $airportData = $response->toArray();
+
+        $airportNames = [];
+        foreach ($airportData as $airport) {
+            $airportNames[$airport['iataCode']] = $airport['name'];
+        }
+
+        return $airportNames;
+    }
+
+    public function getRouteAirports($airport) 
+    {
+        $apiUrl = "https://www.ryanair.com/api/views/locate/searchWidget/routes/en/airport/{$airport}";
+        $httpClient = HttpClient::create();
+        $response = $httpClient->request('GET', $apiUrl);
+        $airportData = $response->toArray();
+
+        $airportNames = [];
+        foreach ($airportData as $airport) {
+            $airportNames[$airport['arrivalAirport']['code']] = $airport['arrivalAirport']['name'];
+        }
+
+        return $airportNames;
+    }
+
     private function getBackgroundColor($price)
     {
         if($price < 200) {

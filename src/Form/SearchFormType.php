@@ -7,29 +7,17 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfonycasts\DynamicForms\DependentField;
 use Symfonycasts\DynamicForms\DynamicFormBuilder;
+use App\Service\FlightsService;
 
 class SearchFormType extends AbstractType
 {
-    private $httpClient;
-
-    public function __construct(HttpClientInterface $httpClient)
-    {
-        $this->httpClient = $httpClient;
-    }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $response = $this->httpClient->request('GET', 'https://www.ryanair.com/api/views/locate/3/airports/en/active');
-        $airportData = $response->toArray();
-
-        // Extract airport names and codes
-        $airportNames = [];
-        foreach ($airportData as $airport) {
-            $airportNames[$airport['iataCode']] = $airport['name'];
-        }
+        $flightService = new FlightsService();
+        $airportNames = $flightService->getAirports();
 
         $builder = new DynamicFormBuilder($builder);
 
@@ -71,11 +59,8 @@ class SearchFormType extends AbstractType
             $builder->addDependent('destination', 'departure', function(DependentField $field, ?string $airport) {
                 
                 if(isset($airport)) {
-                    $departureAirportNamestest = [
-                            'POZ' => 'Poznan',
-                            'WAW' => 'Warsaw',
-                            'LIS' => 'Lisbon',
-                    ];
+                    $flightService = new FlightsService();
+                    $departureAirportNamestest = $flightService->getRouteAirports($airport);
                 }
                 else {
                     $departureAirportNamestest = ['fail'];
