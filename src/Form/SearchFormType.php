@@ -30,14 +30,6 @@ class SearchFormType extends AbstractType
                     'class' => 'form-control',       
                 ],
             ])
-            // ->add('destination', ChoiceType::class, [
-            //     'choices' => [],
-            //     'placeholder' => 'Destination',
-            //     'data' => $options['destination'],
-            //     'attr' => [
-            //         'class' => 'form-control',             
-            //     ],
-            // ])
             ->add('search', SubmitType::class, [
                 'label' => 'Search',
                 'attr' => ['class' => 'btn btn-primary'],
@@ -54,46 +46,27 @@ class SearchFormType extends AbstractType
                     // Add Bootstrap classes to the radio buttons
                     return ['class' => 'form-check-input'];
                 },
-            ]);
-
-            $builder->addDependent('destination', 'departure', function(DependentField $field, ?string $airport) {
+            ])
+            ->addDependent('destination', ['departure'], function(DependentField $field, ?string $airport) use ($options) {
                 
                 if(isset($airport)) {
                     $flightService = new FlightsService();
                     $departureAirportNamestest = $flightService->getRouteAirports($airport);
                 }
                 else {
-                    $departureAirportNamestest = ['fail'];
+                    $departureAirportNamestest = ['Select departure airport.'];
                 }
 
                 $field->add(ChoiceType::class, [
                     'choices' => array_flip($departureAirportNamestest),
                     'placeholder' => 'Destination',
+                    'data' => $options['destination'],
                     'required' => true,
                     'attr' => [
                         'class' => 'form-control',
                     ],
                 ]);
-            });
-    
-                
-                    // Fetch destination airports based on the selected departure airport
-                    // $departureAirportCode = $data['departure'];
-                    // $response = $this->httpClient->request('GET', "https://www.ryanair.com/api/views/locate/searchWidget/routes/en/airport/{$departureAirportCode}");
-                    // $destinationAirportData = $response->toArray();
-    
-                    // // Extract airport names and codes
-                    // $departureAirportNames = [];
-                    // foreach ($destinationAirportData as $airport) {
-                    //     $departureAirportNames[$airport['arrivalAirport']['code'] = $airport['arrivalAirport']['name']];
-                    // }
-                    
-                    // Set the choices for the destination airport field
-                    
-                
-                
-                
-            
+            });         
     }
 
     public function configureOptions(OptionsResolver $resolver): void

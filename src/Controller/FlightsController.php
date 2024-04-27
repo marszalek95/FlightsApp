@@ -35,6 +35,13 @@ class FlightsController extends AbstractController
             'action' => $this->generateUrl('app_addflight'),
         ]);
 
+        if ($form->isSubmitted() && $form->isValid()) {
+            $type = $form->getData()['type'];
+            $departure = $form->getData()['departure'];
+            $destination = $form->getData()['destination'];   
+            return $this->redirect("/addflight/search/{$departure}/{$destination}/{$type}");
+        }
+
         if($type === 'return') {
             $data = [
                 'form' => $form->createView(),

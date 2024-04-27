@@ -99,16 +99,31 @@
       </div>
     </main>
 </div>
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-      // Example JavaScript to handle swap button click
-      document.getElementById('swapButton').addEventListener('click', function () {
-      var departureValue = document.getElementById('search_form_departure').value;
-      var destinationValue = document.getElementById('search_form_destination').value;
+  //     // Example JavaScript to handle swap button click
+  //     document.getElementById('swapButton').addEventListener('click', function () {
+  //     var departureValue = document.getElementById('search_form_departure').value;
+  //     var destinationValue = document.getElementById('search_form_destination').value;
 
-      document.getElementById('search_form_departure').value = destinationValue;
-      document.getElementById('search_form_destination').value = departureValue;
-  });
+  //     document.getElementById('search_form_departure').value = destinationValue;
+  //     document.getElementById('search_form_destination').value = departureValue;
+  // });
+
+  $(document).ready(function() {
+        $('#swapButton').click(function() {
+            // Get the current values of the departure and destination fields
+            var departureValue = $('select[name="search_form[departure]"]').val();
+            var destinationValue = $('select[name="search_form[destination]"]').val();
+
+            // Swap the values of the departure and destination fields
+            $('select[name="search_form[departure]"]').val(destinationValue);
+            $('select[name="search_form[destination]"]').val(departureValue);
+
+            // Trigger the change event on the departure field to update the destination field's choices
+            $('select[name="search_form[departure]"]').trigger('change');
+        });
+    });
 </script>
 
 
