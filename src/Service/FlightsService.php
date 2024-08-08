@@ -3,9 +3,11 @@
 namespace App\Service;
 
 use DateTime;
-use PHPUnit\Util\Color;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpClient\HttpClient;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Flight;
+
 
 class FlightsService extends AbstractController
 {
@@ -61,6 +63,29 @@ class FlightsService extends AbstractController
             // Return a response
             return json_encode($data_callendar);
          
+    }
+
+    public function saveFlights(EntityManagerInterface $entityManager, $obj): void
+    {
+
+        foreach($obj->trips as $key => $trip) {
+            $flightEntity = new Flight();
+            $flightEntity->setFlightNumber($trip->dates[0]->flights[0]->flightNumber);
+            $flightEntity->setDeparture($trip->origin);
+            $flightEntity->setDepartureName($trip->originName);
+            $flightEntity->setDestination($trip->destination);
+            $flightEntity->setDestinationName($trip->destinationName);
+            $flightEntity->setDateDepart(new DateTime($trip->dates[0]->flights[0]->time[0]));
+            $flightEntity->setDateArriv(new DateTime($trip->dates[0]->flights[0]->time[1]));
+            $flightEntity->setPrice($trip->dates[0]->flights[0]->regularFare->fares[0]->amount);
+            $flightEntity->setCurrency($obj->currency);
+            $flightEntity->setReturnFlight($key == 0 ? $obj->trips[1]->dates[0]->flights[0]->flightNumber : $obj->trips[0]->dates[0]->flights[0]->flightNumber);
+
+
+            $entityManager->persist($flightEntity);
+        }
+        $entityManager->flush();
+        
     }
 
     public function getAirports() 

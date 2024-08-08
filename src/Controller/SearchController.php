@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Form\SaveFormType;
 use App\Form\SearchFormType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +17,7 @@ class SearchController extends AbstractController
     public function search(Request $request): Response
     {
         $form = $this->createForm(SearchFormType::class);
+        $saveform = $this->createForm(SaveFormType::class);
 
         $form->handleRequest($request);
 
@@ -28,8 +30,11 @@ class SearchController extends AbstractController
 
         return $this->render('flights/add_flight.html.twig', [
             'form' => $form,
+            'saveform' => $saveform,
             'data_departure' => null,
             'type' => null,
+            'departure' => null,
+            'destination' => null
         ]);
     }
 }

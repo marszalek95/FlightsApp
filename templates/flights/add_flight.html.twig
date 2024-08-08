@@ -19,6 +19,20 @@
           height: 550,
           themeSystem: 'bootstrap5',
           eventBackgroundColor: '#2c3e50',
+          eventClick: function(info) {
+            // Extract the event date and format it to YYYY-MM-DD
+            var eventDate = info.event.startStr;
+            console.log(info.event);
+            // Find the button with the data-action attribute and trigger a click
+            var button = document.querySelector('button[data-live-action-param="addDeparture"]');
+            if (button) {
+                // Set a custom attribute or data parameter if needed
+                button.setAttribute('data-live-departure-param', eventDate);
+                
+                // Trigger the click event on the button to call the live action
+                button.click();
+            }
+          }
         });
         calendar.render();
     });
@@ -35,6 +49,20 @@
           height: 550,
           themeSystem: 'bootstrap5',
           eventBackgroundColor: '#2c3e50',
+          eventClick: function(info) {
+            // Extract the event date and format it to YYYY-MM-DD
+            var eventDate = info.event.startStr;
+            console.log(info.event);
+            // Find the button with the data-action attribute and trigger a click
+            var button = document.querySelector('button[data-live-action-param="addDestination"]');
+            if (button) {
+                // Set a custom attribute or data parameter if needed
+                button.setAttribute('data-live-destination-param', eventDate);
+                
+                // Trigger the click event on the button to call the live action
+                button.click();
+            }
+          }
         });
         calendar.render();
     });
@@ -57,24 +85,25 @@
 <div class="container-fluid mt-2">
     {% include 'sidebar.html.twig' %}
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
       <h4>Flight Search</h1>
       <div class="row">
         {{ component('SearchFlights', {
           form: form
       }) }}
 
-        
-            <div class="col-md-4">
-              <div class="input-group">
-                <span class="input-group-text">Departure</span>
-                <input type="text" id="departureDate" class="form-control" readonly>
-                {% if type == 'return' %}
-                <span class="input-group-text">Return</span>
-                <input type="text" id="returnDate" class="form-control" readonly>
-                {% endif %}
-                <button class="btn btn-primary" id="addFlightBtn">Add Flight</button>
-              </div>
-            </div>
+      {{ component('SaveFlights', {
+        form: saveform,
+        type: type,
+        departure: departure,
+        destination: destination,
+      }) }}
+
+            
           
       </div>
       
@@ -85,13 +114,13 @@
           <!-- First Column (col-md-4 for medium and larger screens) -->
           <div class="col-md-4">
             <h4> Depatrute </h1>
-            <div id='calendarDepart'></div>
+            <div id='calendarDepart' data-action="live#action" data-live-action-param="addDeparture"></div>
           </div>
           {% if type == 'return' %}
           <!-- Second Column (col-md-4 for medium and larger screens) -->
            <div class="col-md-4">
             <h4> Return </h1>
-            <div id='calendarReturn'></div>
+            <div id='calendarReturn' data-action="live#action" data-live-action-param="addDestination"></div>
           </div>
           {% endif %}
 
@@ -99,32 +128,5 @@
       </div>
     </main>
 </div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-  //     // Example JavaScript to handle swap button click
-  //     document.getElementById('swapButton').addEventListener('click', function () {
-  //     var departureValue = document.getElementById('search_form_departure').value;
-  //     var destinationValue = document.getElementById('search_form_destination').value;
-
-  //     document.getElementById('search_form_departure').value = destinationValue;
-  //     document.getElementById('search_form_destination').value = departureValue;
-  // });
-
-  $(document).ready(function() {
-        $('#swapButton').click(function() {
-            // Get the current values of the departure and destination fields
-            var departureValue = $('select[name="search_form[departure]"]').val();
-            var destinationValue = $('select[name="search_form[destination]"]').val();
-
-            // Swap the values of the departure and destination fields
-            $('select[name="search_form[departure]"]').val(destinationValue);
-            $('select[name="search_form[destination]"]').val(departureValue);
-
-            // Trigger the change event on the departure field to update the destination field's choices
-            $('select[name="search_form[departure]"]').trigger('change');
-        });
-    });
-</script>
-
 
 {% endblock %}

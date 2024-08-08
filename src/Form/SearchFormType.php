@@ -27,7 +27,7 @@ class SearchFormType extends AbstractType
                 'placeholder' => 'Departure',
                 'data' => $options['departure'],
                 'attr' => [
-                    'class' => 'form-control',       
+                    'class' => 'form-control',
                 ],
             ])
             ->add('search', SubmitType::class, [
