@@ -29,20 +29,17 @@ class Flight
     #[ORM\Column(length: 255)]
     private ?string $destinationName = null;
 
-    #[ORM\Column]
-    private ?int $price = null;
-
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateDepart = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateArriv = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $currency = null;
-
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $returnFlight = null;
+
+    #[ORM\Column]
+    private ?int $user_id = null;
 
 
     public function getId(): ?int
@@ -86,18 +83,6 @@ class Flight
         return $this;
     }
 
-    public function getPrice(): ?int
-    {
-        return $this->price;
-    }
-
-    public function setPrice(int $price): static
-    {
-        $this->price = $price;
-
-        return $this;
-    }
-
     public function getDateDepart(): ?\DateTimeInterface
     {
         return $this->dateDepart;
@@ -118,18 +103,6 @@ class Flight
     public function setDateArriv(?\DateTimeInterface $dateArriv): static
     {
         $this->dateArriv = $dateArriv;
-
-        return $this;
-    }
-
-    public function getCurrency(): ?string
-    {
-        return $this->currency;
-    }
-
-    public function setCurrency(string $currency): static
-    {
-        $this->currency = $currency;
 
         return $this;
     }
@@ -166,6 +139,18 @@ class Flight
     public function setReturnFlight(?string $returnFlight): static
     {
         $this->returnFlight = $returnFlight;
+
+        return $this;
+    }
+
+    public function getUserId(): ?int
+    {
+        return $this->user_id;
+    }
+
+    public function setUserId(int $user_id): static
+    {
+        $this->user_id = $user_id;
 
         return $this;
     }

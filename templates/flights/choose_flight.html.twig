@@ -1,11 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block nav %} {% endblock %}
-
 {% block title %}Choose Flight{% endblock %}
 
 {% block body %}
-    <div class="container">
+    <div class="container-fluid mt-2">
+        {% include 'sidebar.html.twig' %}
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+          {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
         <h1>Select Your Flights</h1>
         <form method="post" action="{{ path('app_save_flight') }}">
             <h2>{{ flights.trips[0].originName }} to {{ flights.trips[0].destinationName }} at {{ flights.trips[0].dates[0].dateOut|date("Y-m-d") }}</h2>
@@ -71,5 +76,6 @@
             <input type="hidden" name="flights" value="{{ flights|json_encode }}">
             <button type="submit" class="btn btn-primary">Select Flights</button>
         </form>
+        </main>
     </div>
 {% endblock %}

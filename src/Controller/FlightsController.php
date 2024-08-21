@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Flight;
+use App\Entity\FlightPrices;
 use App\Form\SaveFormType;
 use App\Form\SearchFormType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -10,8 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Service\FlightsService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-
-
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class FlightsController extends AbstractController
 {
@@ -22,10 +23,50 @@ class FlightsController extends AbstractController
     }
 
     #[Route('/flights', name: 'app_flights')]
-    public function index(): Response
+    public function flights(EntityManagerInterface $entityManager): Response
     {
-        return $this->render('flights/index.html.twig', [
-            
+        /** @var \App\Entity\User $user */
+        $user = $this->getUser();
+
+        $flights = $entityManager->getRepository(Flight::class)->findby(['user_id' => $user->getId()]);
+
+        $processedReturnFlights = [];
+
+        $flightsData = [];
+        foreach ($flights as $flight) {
+            // Check if this flight has a return flight
+            if (in_array($flight->getId(), $processedReturnFlights)) {
+                continue;
+            }
+    
+            if ($flight->getReturnFlight()) {
+                $returnFlight = $entityManager->getRepository(Flight::class)->find($flight->getReturnFlight());
+    
+                // Ensure the return flight exists and hasn't already been processed
+                if ($returnFlight && !in_array($returnFlight->getId(), $processedReturnFlights)) {
+                    $flightsData[] = [
+                        'flight' => $flight,
+                        'returnFlight' => $returnFlight,
+                        'prices' => $entityManager->getRepository(FlightPrices::class)->findBy(['flight_id' => $flight->getId()],['recorded_at' => 'ASC']),
+                        'returnPrices' => $entityManager->getRepository(FlightPrices::class)->findBy(['flight_id' => $returnFlight->getId()],['recorded_at' => 'ASC']),
+                    ];
+    
+                    // Mark the return flight as processed
+                    $processedReturnFlights[] = $returnFlight->getId();
+                }
+            } else {
+                $flightsData[] = [
+                    'flight' => $flight,
+                    'returnFlight' => null,
+                    'prices' => $entityManager->getRepository(FlightPrices::class)->findBy(['flight_id' => $flight->getId()])
+                ];
+            }
+        }
+
+        
+
+        return $this->render('flights/flights.html.twig', [
+            'flightsData' => $flightsData,
         ]);
     }
 
@@ -76,9 +117,12 @@ class FlightsController extends AbstractController
          
     }
 
-    #[Route('/save-flight', name: 'app_save_flight', methods: ['POST'])]
-    public function saveFlight(EntityManagerInterface $entityManager, Request $request): Response
+    #[Route('/chooseflight', name: 'app_save_flight')]
+    public function saveFlight(EntityManagerInterface $entityManager, Request $request, SessionInterface $session): Response
     {
+        $obj = $session->get('flights');
+
+        if($request->isMethod('POST')) {
         $outboundKey = $request->request->get('outbound_key');
         $returnKey = $request->request->get('return_key');
         $flightsJson = $request->request->get('flights');
@@ -100,8 +144,10 @@ class FlightsController extends AbstractController
         sort($flights->trips[1]->dates[0]->flights);
 
         $this->flightService->saveFlights($entityManager, $flights);
-
         return $this->redirectToRoute('app_flights');
+        }
+
+        return $this->render('flights/choose_flight.html.twig', ['flights' => $obj]);
 
     }
 

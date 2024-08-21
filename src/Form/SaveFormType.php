@@ -35,6 +35,14 @@ class SaveFormType extends AbstractType
                     'data-live-action-param' => 'fetchFlights'
                 ],
             ])
+            ->add('save_oneway', SubmitType::class, [
+                'label' => 'Save',
+                'attr' => [
+                    'class' => 'btn btn-primary',
+                    'data-action' => 'live#action:prevent',
+                    'data-live-action-param' => 'fetchFlight'
+                ],
+            ])
         ;
     }
 

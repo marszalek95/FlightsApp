@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpClient\HttpClient;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Flight;
+use App\Entity\FlightPrices;
 
 
 class FlightsService extends AbstractController
@@ -67,6 +68,11 @@ class FlightsService extends AbstractController
 
     public function saveFlights(EntityManagerInterface $entityManager, $obj): void
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        /** @var \App\Entity\User $user */
+        $user = $this->getUser();
+
+        date_default_timezone_set('Europe/Warsaw');
 
         foreach($obj->trips as $key => $trip) {
             $flightEntity = new Flight();
@@ -77,12 +83,34 @@ class FlightsService extends AbstractController
             $flightEntity->setDestinationName($trip->destinationName);
             $flightEntity->setDateDepart(new DateTime($trip->dates[0]->flights[0]->time[0]));
             $flightEntity->setDateArriv(new DateTime($trip->dates[0]->flights[0]->time[1]));
-            $flightEntity->setPrice($trip->dates[0]->flights[0]->regularFare->fares[0]->amount);
-            $flightEntity->setCurrency($obj->currency);
-            $flightEntity->setReturnFlight($key == 0 ? $obj->trips[1]->dates[0]->flights[0]->flightNumber : $obj->trips[0]->dates[0]->flights[0]->flightNumber);
+            $flightEntity->setUserId($user->getId());
 
 
             $entityManager->persist($flightEntity);
+            $entityManager->flush();
+
+            $flightPriceEntity = new FlightPrices();
+            $flightPriceEntity->setFlightId($flightEntity->getId());  // Set the flight_id
+            $flightPriceEntity->setPrice($trip->dates[0]->flights[0]->regularFare->fares[0]->amount);  // Assuming this is where the price is
+            $flightPriceEntity->setCurrency($obj->currency);
+            $flightPriceEntity->setRecordedAt(new \DateTime());
+            $flightPriceEntity->setUserId($user->getId());
+
+
+            // Persist the FlightPrice entity
+            $entityManager->persist($flightPriceEntity);
+
+            $flights[] = $flightEntity;
+
+            if(count($obj->trips) > 1 && $key === 1) {
+                // Link the return flight to the outbound flight and vice versa
+                $flights[0]->setReturnFlight($flights[1]->getId());
+                $flights[1]->setReturnFlight($flights[0]->getId());
+    
+                // Persist the updated flight entities
+                $entityManager->persist($flights[0]);
+                $entityManager->persist($flights[1]);
+            }
         }
         $entityManager->flush();
         

@@ -6,8 +6,11 @@
         {% if type == 'return' %}
         <span class="input-group-text">Return</span>
         {{ form_widget(form.destinationselect) }}
-        {% endif %}
         {{ form_widget(form.save) }}
+        {% else %}
+        {{ form_widget(form.save_oneway) }}  
+        {% endif %}
+        
         
       </div>
       <button class="btn btn-outline-secondary" type="button" data-action="live#action" data-live-action-param="addDeparture" style="display: none;">

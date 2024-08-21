@@ -1,0 +1,159 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Your flights list!{% endblock %}
+   
+
+{% block body %}
+     <style>
+    
+</style>
+    {# {{ dump(flightsData) }} #}
+    <div class="container-fluid mt-2">
+    {% include 'sidebar.html.twig' %}
+      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <div class="row">
+        {% for flightGroup in flightsData %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <h5 class="card-title col-md">Flight {{ flightGroup.flight.flightNumber }}</h5>
+                            {{ component('DeleteFlight') }}
+                        </div>
+                        <p class="card-text">
+                            <strong>Departure:</strong> {{ flightGroup.flight.departureName }} ({{ flightGroup.flight.departure }})<br>
+                            <strong>Destination:</strong> {{ flightGroup.flight.destinationName }} ({{ flightGroup.flight.destination }})<br>
+                            <strong>Depart Date:</strong> {{ flightGroup.flight.dateDepart|date('Y-m-d H:i') }}<br>
+                            <strong>Arrive Date:</strong> {{ flightGroup.flight.dateArriv|date('Y-m-d H:i') }}<br>
+                        </p>
+                        <div class="chart-container">
+                            <div class="chart-wrapper-outbound" id="chartWrapper-outbound{{ loop.index }}">
+                                <canvas id="priceChart{{ loop.index }}-outbound"></canvas>
+                            </div>
+                        </div>
+                        {% if flightGroup.returnFlight %}
+                            <h5 class="card-title mt-4">Return Flight {{ flightGroup.returnFlight.flightNumber }}</h5>
+                            <p class="card-text">
+                                <strong>Departure:</strong> {{ flightGroup.returnFlight.departureName }} ({{ flightGroup.returnFlight.departure }})<br>
+                                <strong>Destination:</strong> {{ flightGroup.returnFlight.destinationName }} ({{ flightGroup.returnFlight.destination }})<br>
+                                <strong>Depart Date:</strong> {{ flightGroup.returnFlight.dateDepart|date('Y-m-d H:i') }}<br>
+                                <strong>Arrive Date:</strong> {{ flightGroup.returnFlight.dateArriv|date('Y-m-d H:i') }}<br>
+                            </p>
+                            <div class="chart-container">
+                                <div class="chart-wrapper-return" id="chartWrapper-return{{ loop.index }}">
+                                    <canvas id="priceChart{{ loop.index }}-return"></canvas>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        {% for flightGroup in flightsData %}
+            var barCount = {{ flightGroup.prices|length }};
+            var minWidth = Math.max(barCount * 50, 50); // Each bar has a minimum width of 50px, and the chart has a minimum width of 600px.
+            document.getElementById('chartWrapper-outbound{{ loop.index }}').style.minWidth = minWidth + 'px';
+
+            // Outbound Flight Chart
+            var ctxOutbound = document.getElementById('priceChart{{ loop.index }}-outbound').getContext('2d');
+            var chartOutbound = new Chart(ctxOutbound, {
+                type: 'bar',
+                data: {
+                    labels: [{% for price in flightGroup.prices %}'{{ price.recordedAt|date('Y-m-d') }}', {% endfor %}],
+                    datasets: [{
+                        label: 'Price ({{ flightGroup.prices[0].currency }})',
+                        data: [{% for price in flightGroup.prices %}{{ price.price }}, {% endfor %}],
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        barThickness: 30, // Adjust bar thickness if necessary
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            },
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Price'
+                            },
+                            grid: {
+                                display: true
+                            }
+                        }
+                    }
+                }
+            });
+
+            {% if flightGroup.returnFlight %}
+                var returnBarCount = {{ flightGroup.returnPrices|length }};
+                var returnMinWidth = Math.max(returnBarCount * 50, 50); // Ensures a minimum width
+                document.getElementById('chartWrapper-return{{ loop.index }}').style.minWidth = returnMinWidth + 'px';
+
+                // Return Flight Chart
+                var ctxReturn = document.getElementById('priceChart{{ loop.index }}-return').getContext('2d');
+                var chartReturn = new Chart(ctxReturn, {
+                    type: 'bar',
+                    data: {
+                        labels: [{% for price in flightGroup.returnPrices %}'{{ price.recordedAt|date('Y-m-d') }}', {% endfor %}],
+                        datasets: [{
+                            label: 'Price ({{ flightGroup.returnPrices[0].currency }})',
+                            data: [{% for price in flightGroup.returnPrices %}{{ price.price }}, {% endfor %}],
+                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            borderWidth: 1,
+                            barThickness: 30, // Adjust bar thickness if necessary
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                display: true,
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            },
+                            y: {
+                                display: true,
+                                title: {
+                                    display: true,
+                                    text: 'Price'
+                                },
+                                grid: {
+                                    display: true
+                                }
+                            }
+                        }
+                    }
+                });
+            {% endif %}
+        {% endfor %}
+    });
+</script>
+{% endblock %}
