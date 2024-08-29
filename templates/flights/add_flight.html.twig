@@ -113,14 +113,14 @@
       <div class="row">       
           <!-- First Column (col-md-4 for medium and larger screens) -->
           <div class="col-md-4">
-            <h4> Depatrute </h1>
-            <div id='calendarDepart'></div>
+            <h4> Departure </h1>
+            <div id='calendarDepart' data-action="live#action" data-live-action-param="addDeparture"></div>
           </div>
           {% if type == 'return' %}
           <!-- Second Column (col-md-4 for medium and larger screens) -->
            <div class="col-md-4">
             <h4> Return </h1>
-            <div id='calendarReturn'></div>
+            <div id='calendarReturn' data-action="live#action" data-live-action-param="addDestination"></div>
           </div>
           {% endif %}
 

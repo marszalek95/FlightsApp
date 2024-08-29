@@ -133,15 +133,16 @@ class FlightsController extends AbstractController
                 unset($flights->trips[0]->dates[0]->flights[$key]);
             }
         }
-
-        foreach ($flights->trips[1]->dates[0]->flights as $key => $flight) {
-            if($key != $returnKey) {
-                unset($flights->trips[1]->dates[0]->flights[$key]);
-            }
-        }
-
         sort($flights->trips[0]->dates[0]->flights);
-        sort($flights->trips[1]->dates[0]->flights);
+
+        if (isset($returnKey)) {
+            foreach ($flights->trips[1]->dates[0]->flights as $key => $flight) {
+                if($key != $returnKey) {
+                    unset($flights->trips[1]->dates[0]->flights[$key]);
+                }
+            }
+            sort($flights->trips[1]->dates[0]->flights);
+        }
 
         $this->flightService->saveFlights($entityManager, $flights);
         return $this->redirectToRoute('app_flights');
