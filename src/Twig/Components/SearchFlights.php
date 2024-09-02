@@ -19,6 +19,7 @@ class SearchFlights extends AbstractController
     #[LiveAction]
     public function swap()
     {
+        // Swapping airports in search
         $departure = $this->formValues['departure'];
         $destination = $this->formValues['destination'];
         $this->formValues['departure'] = $destination;

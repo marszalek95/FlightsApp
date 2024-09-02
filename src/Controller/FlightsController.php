@@ -10,7 +10,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Service\FlightsService;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,16 +34,16 @@ class FlightsController extends AbstractController
         $processedReturnFlights = [];
 
         $flightsData = [];
+
         foreach ($flights as $flight) {
-            // Check if this flight has a return flight
+            // Ensure the return flight exists and hasn't already been processed
             if (in_array($flight->getId(), $processedReturnFlights)) {
                 continue;
             }
     
             if ($flight->getReturnFlight()) {
                 $returnFlight = $entityManager->getRepository(Flight::class)->find($flight->getReturnFlight());
-    
-                // Ensure the return flight exists and hasn't already been processed
+                // Check if this flight has a return flight
                 if ($returnFlight && !in_array($returnFlight->getId(), $processedReturnFlights)) {
                     $flightsData[] = [
                         'flight' => $flight,
@@ -65,10 +64,9 @@ class FlightsController extends AbstractController
             }
         }
 
-        
-
         return $this->render('flights/flights.html.twig', [
             'flightsData' => $flightsData,
+            'flights' => $flights,
         ]);
     }
 
@@ -96,7 +94,6 @@ class FlightsController extends AbstractController
 
         $form->handleRequest($request);
 
-
         if ($form->isSubmitted() && $form->isValid()) {
             $type = $form->getData()['type'];
             $departure = $form->getData()['departure'];
@@ -123,9 +120,7 @@ class FlightsController extends AbstractController
             ];
         }
 
-            // Return a response (you may want to render a template or return JSON, depending on your needs)
-            return $this->render('flights/add_flight.html.twig', $data);
-         
+        return $this->render('flights/add_flight.html.twig', $data);        
     }
 
     #[Route('/chooseflight', name: 'app_save_flight')]
@@ -134,33 +129,33 @@ class FlightsController extends AbstractController
         $obj = $session->get('flights');
 
         if($request->isMethod('POST')) {
-        $outboundKey = $request->request->get('outbound_key');
-        $returnKey = $request->request->get('return_key');
-        $flightsJson = $request->request->get('flights');
-        $flights = json_decode($flightsJson);
+            $outboundKey = $request->request->get('outbound_key');
+            $returnKey = $request->request->get('return_key');
+            $flightsJson = $request->request->get('flights');
+            $flights = json_decode($flightsJson);
 
-        foreach ($flights->trips[0]->dates[0]->flights as $key => $flight) {
-            if($key != $outboundKey) {
-                unset($flights->trips[0]->dates[0]->flights[$key]);
-            }
-        }
-        sort($flights->trips[0]->dates[0]->flights);
-
-        if (isset($returnKey)) {
-            foreach ($flights->trips[1]->dates[0]->flights as $key => $flight) {
-                if($key != $returnKey) {
-                    unset($flights->trips[1]->dates[0]->flights[$key]);
+            // Unset rest flights for flights with return
+            foreach ($flights->trips[0]->dates[0]->flights as $key => $flight) {
+                if($key != $outboundKey) {
+                    unset($flights->trips[0]->dates[0]->flights[$key]);
                 }
             }
-            sort($flights->trips[1]->dates[0]->flights);
-        }
+            sort($flights->trips[0]->dates[0]->flights);
 
-        $this->flightService->saveFlights($entityManager, $flights);
-        return $this->redirectToRoute('app_flights');
+            // Unset rest flights fot flights without return
+            if (isset($returnKey)) {
+                foreach ($flights->trips[1]->dates[0]->flights as $key => $flight) {
+                    if($key != $returnKey) {
+                        unset($flights->trips[1]->dates[0]->flights[$key]);
+                    }
+                }
+                sort($flights->trips[1]->dates[0]->flights);
+            }
+
+            $this->flightService->saveFlights($entityManager, $flights);
+            return $this->redirectToRoute('app_flights');
         }
 
         return $this->render('flights/choose_flight.html.twig', ['flights' => $obj]);
-
     }
-
 }

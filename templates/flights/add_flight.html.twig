@@ -11,19 +11,17 @@
     document.addEventListener('DOMContentLoaded', function() {
       var calendarEl = document.getElementById('calendarDepart');
       var calendar = new FullCalendar.Calendar(calendarEl, {  
-          events: [],  // Set to an empty array to avoid fetching from /events  
+          events: [],
           eventOrder: "eventProperty",
           height: 550,
           themeSystem: 'bootstrap5',
           eventBackgroundColor: '#2c3e50',
           eventClick: function(info) {
-            // Extract the event date and format it to YYYY-MM-DD
             var eventDate = info.event.startStr;
             console.log(info.event);
             // Find the button with the data-action attribute and trigger a click
             var button = document.querySelector('button[data-live-action-param="addDeparture"]');
             if (button) {
-                // Set a custom attribute or data parameter if needed
                 button.setAttribute('data-live-departure-param', eventDate);
                 
                 // Trigger the click event on the button to call the live action
@@ -31,6 +29,7 @@
             }
           },
           datesSet: function (info) {
+            // Find and set current displayed month
             var dateCalendar = calendar.getDate();
             date = dateCalendar.toLocaleDateString('en-CA');
             fetchEvents(date);
@@ -53,8 +52,6 @@
     });
     {% endif %}
 
-
-
     {% if destination %}
     document.addEventListener('DOMContentLoaded', function() {
       var calendarEl = document.getElementById('calendarReturn');
@@ -65,13 +62,11 @@
           themeSystem: 'bootstrap5',
           eventBackgroundColor: '#2c3e50',
           eventClick: function(info) {
-            // Extract the event date and format it to YYYY-MM-DD
             var eventDate = info.event.startStr;
             console.log(info.event);
             // Find the button with the data-action attribute and trigger a click
             var button = document.querySelector('button[data-live-action-param="addDestination"]');
             if (button) {
-                // Set a custom attribute or data parameter if needed
                 button.setAttribute('data-live-destination-param', eventDate);
                 
                 // Trigger the click event on the button to call the live action
@@ -79,6 +74,7 @@
             }
           },
           datesSet: function (info) {
+            // Find and set current displayed month
             var dateCalendar = calendar.getDate();
             date = dateCalendar.toLocaleDateString('en-CA');
             fetchEvents(date);
@@ -100,20 +96,11 @@
         }
     });
     {% endif %}
-    </script>
-    
-   
-
-
-  
+    </script> 
 
 {% endblock %}
 
 {% block body %}
-
-
-
-  {# [{"title": "269złhehe", "start": "2024-02-26"},{"title": "9:30 - 11:30", "start": "2024-02-26"}]; #}
   
 <div class="container-fluid mt-2">
     {% include 'sidebar.html.twig' %}
@@ -144,21 +131,20 @@
       
       {% if departure %}
       <div class="row">       
-          <!-- First Column (col-md-4 for medium and larger screens) -->
+          <!-- First Column -->
           <div class="col-md-4">
             <h4> Departure </h1>
             <div id='calendarDepart' data-action="live#action" data-live-action-param="addDeparture"></div>
           </div>
           {% if destination %}
-          <!-- Second Column (col-md-4 for medium and larger screens) -->
+          <!-- Second Column -->
            <div class="col-md-4">
             <h4> Return </h1>
             <div id='calendarReturn' data-action="live#action" data-live-action-param="addDestination"></div>
           </div>
           {% endif %}
       {% endif %}
-
-    
+       
       </div>
     </main>
 </div>

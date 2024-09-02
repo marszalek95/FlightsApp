@@ -15,8 +15,6 @@ class FlightsService extends AbstractController
 
     public function searchFlight($departure, $destination, $targetDate)
     {   
-        
-
             // Fetch data from the API
             $apiUrl = "https://www.ryanair.com/api/farfnd/v4/oneWayFares/{$departure}/{$destination}/cheapestPerDay?outboundMonthOfDate={$targetDate->format('Y-m-d')}&currency=PLN";
             $httpClient = HttpClient::create();
@@ -25,7 +23,7 @@ class FlightsService extends AbstractController
 
             $obj = json_decode($data);
 
-            // Check if the request was successful (status code 200)
+            // Check if the request was successful
             if ($response->getStatusCode() === 200) {              
                 foreach($obj->outbound->fares as $fare) {
                     if($fare->unavailable == false) {
@@ -50,7 +48,6 @@ class FlightsService extends AbstractController
                 $data_callendar = [];
             }
 
-            // Return a response
             return json_encode($data_callendar);
          
     }
@@ -74,25 +71,22 @@ class FlightsService extends AbstractController
             $flightEntity->setDateArriv(new DateTime($trip->dates[0]->flights[0]->time[1]));
             $flightEntity->setUserId($user->getId());
 
-
             $entityManager->persist($flightEntity);
             $entityManager->flush();
 
             $flightPriceEntity = new FlightPrices();
-            $flightPriceEntity->setFlightId($flightEntity->getId());  // Set the flight_id
-            $flightPriceEntity->setPrice($trip->dates[0]->flights[0]->regularFare->fares[0]->amount);  // Assuming this is where the price is
+            $flightPriceEntity->setFlightId($flightEntity->getId());
+            $flightPriceEntity->setPrice($trip->dates[0]->flights[0]->regularFare->fares[0]->amount);  
             $flightPriceEntity->setCurrency($obj->currency);
             $flightPriceEntity->setRecordedAt(new \DateTime());
             $flightPriceEntity->setUserId($user->getId());
 
-
-            // Persist the FlightPrice entity
             $entityManager->persist($flightPriceEntity);
 
             $flights[] = $flightEntity;
 
             if(count($obj->trips) > 1 && $key === 1) {
-                // Link the return flight to the outbound flight and vice versa
+                // Link the return flight to the outbound flight return flight
                 $flights[0]->setReturnFlight($flights[1]->getId());
                 $flights[1]->setReturnFlight($flights[0]->getId());
     
@@ -107,11 +101,13 @@ class FlightsService extends AbstractController
 
     public function getAirports() 
     {
+        // Fetch data from the API
         $apiUrl = 'https://www.ryanair.com/api/views/locate/3/airports/en/active';
         $httpClient = HttpClient::create();
         $response = $httpClient->request('GET', $apiUrl);
         $airportData = $response->toArray();
 
+        // Filter only names with iataCode
         $airportNames = [];
         foreach ($airportData as $airport) {
             $airportNames[$airport['iataCode']] = $airport['name'];
@@ -122,6 +118,7 @@ class FlightsService extends AbstractController
 
     public function getRouteAirports($airport) 
     {
+        // Fetch data from the API
         $apiUrl = "https://www.ryanair.com/api/views/locate/searchWidget/routes/en/airport/{$airport}";
         $httpClient = HttpClient::create();
         $response = $httpClient->request('GET', $apiUrl);

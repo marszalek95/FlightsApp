@@ -23,10 +23,10 @@ class DeleteFlight extends AbstractController
     #[LiveAction]
     public function deleteFlight(#[LiveArg] int $id, #[LiveArg] EntityManagerInterface $entityManager)
     {
-
         $flight = $entityManager->getRepository(Flight::class)->find($id);
         $prices = $entityManager->getRepository(FlightPrices::class)->findby(['flight_id' => $id]);
         $entityManager->remove($flight);
+
         foreach ($prices as $price) {
             $entityManager->remove($price);
         }
@@ -35,12 +35,13 @@ class DeleteFlight extends AbstractController
             $flightReturn = $entityManager->getRepository(Flight::class)->find($flight->return_flight);
             $pricesReturn = $entityManager->getRepository(FlightPrices::class)->findby(['flight_id' => $flight->return_flight]);
             $entityManager->remove($flightReturn);
+
             foreach ($pricesReturn as $priceReturn) {
                 $entityManager->remove($priceReturn);
             }
         }
 
-       $entityManager->flush();
+        $entityManager->flush();
 
         return $this->redirectToRoute('app_flights');
 

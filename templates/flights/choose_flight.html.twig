@@ -11,72 +11,72 @@
                 {{ message }}
             </div>
         {% endfor %}
-        <h1>Select Your Flights</h1>
-        <form method="post" action="{{ path('app_save_flight') }}">
-            <h2>{{ flights.trips[0].originName }} to {{ flights.trips[0].destinationName }} at {{ flights.trips[0].dates[0].dateOut|date("Y-m-d") }}</h2>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Flight Number</th>
-                        <th>Departure Time</th>
-                        <th>Arrival Time</th>
-                        <th>Duration</th>
-                        <th>Price</th>
-                        <th>Select</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for date in flights.trips[0].dates %}
-                        {% for flightKey, flight in date.flights %}
-                            <tr>
-                                <td>{{ flight.flightNumber }}</td>
-                                <td>{{ flight.time[0]|date("H:i") }}</td>
-                                <td>{{ flight.time[1]|date("H:i") }}</td>
-                                <td>{{ flight.duration }}</td>
-                                <td>{{ flight.regularFare.fares[0].amount }} {{ flights.currency }}</td>
-                                <td>
-                                    <input type="radio" name="outbound_key" value="{{ flightKey }}">
-                                </td>
-                            </tr>
+            <h1>Select Your Flights</h1>
+            <form method="post" action="{{ path('app_save_flight') }}">
+                <h2>{{ flights.trips[0].originName }} to {{ flights.trips[0].destinationName }} at {{ flights.trips[0].dates[0].dateOut|date("Y-m-d") }}</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Flight Number</th>
+                            <th>Departure Time</th>
+                            <th>Arrival Time</th>
+                            <th>Duration</th>
+                            <th>Price</th>
+                            <th>Select</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for date in flights.trips[0].dates %}
+                            {% for flightKey, flight in date.flights %}
+                                <tr>
+                                    <td>{{ flight.flightNumber }}</td>
+                                    <td>{{ flight.time[0]|date("H:i") }}</td>
+                                    <td>{{ flight.time[1]|date("H:i") }}</td>
+                                    <td>{{ flight.duration }}</td>
+                                    <td>{{ flight.regularFare.fares[0].amount }} {{ flights.currency }}</td>
+                                    <td>
+                                        <input type="radio" name="outbound_key" value="{{ flightKey }}">
+                                    </td>
+                                </tr>
+                            {% endfor %}
                         {% endfor %}
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% if flights.trips[1] is defined %}
-            <h2>{{ flights.trips[1].originName }} to {{ flights.trips[1].destinationName }} at {{ flights.trips[1].dates[0].dateOut|date("Y-m-d") }}</h2>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Flight Number</th>
-                        <th>Departure Time</th>
-                        <th>Arrival Time</th>
-                        <th>Duration</th>
-                        <th>Price</th>
-                        <th>Select</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for date in flights.trips[1].dates %}
-                        {% for flightKey, flight in date.flights %}
-                            <tr>
-                                <td>{{ flight.flightNumber }}</td>
-                                <td>{{ flight.time[0]|date("H:i") }}</td>
-                                <td>{{ flight.time[1]|date("H:i") }}</td>
-                                <td>{{ flight.duration }}</td>
-                                <td>{{ flight.regularFare.fares[0].amount }} {{ flights.currency }}</td>
-                                <td>
-                                    <input type="radio" name="return_key" value="{{ flightKey }}">
-                                </td>
-                            </tr>
+                    </tbody>
+                </table>
+            {% if flights.trips[1] is defined %}
+                <h2>{{ flights.trips[1].originName }} to {{ flights.trips[1].destinationName }} at {{ flights.trips[1].dates[0].dateOut|date("Y-m-d") }}</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Flight Number</th>
+                            <th>Departure Time</th>
+                            <th>Arrival Time</th>
+                            <th>Duration</th>
+                            <th>Price</th>
+                            <th>Select</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for date in flights.trips[1].dates %}
+                            {% for flightKey, flight in date.flights %}
+                                <tr>
+                                    <td>{{ flight.flightNumber }}</td>
+                                    <td>{{ flight.time[0]|date("H:i") }}</td>
+                                    <td>{{ flight.time[1]|date("H:i") }}</td>
+                                    <td>{{ flight.duration }}</td>
+                                    <td>{{ flight.regularFare.fares[0].amount }} {{ flights.currency }}</td>
+                                    <td>
+                                        <input type="radio" name="return_key" value="{{ flightKey }}">
+                                    </td>
+                                </tr>
+                            {% endfor %}
                         {% endfor %}
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}
+                    </tbody>
+                </table>
+            {% endif %}
 
             <input type="hidden" name="flights" value="{{ flights|json_encode }}">
             <button type="submit" class="btn btn-primary">Select Flights</button>
-        </form>
+            </form>
         </main>
     </div>
 {% endblock %}

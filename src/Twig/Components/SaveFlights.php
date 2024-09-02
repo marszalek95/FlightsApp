@@ -15,7 +15,6 @@ use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\Component\HttpClient\HttpClient;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 #[AsLiveComponent(csrf: false)]
@@ -57,7 +56,7 @@ class SaveFlights extends AbstractController
     }
 
     #[LiveAction]
-    public function fetchFlights(EntityManagerInterface $entityManager, LoggerInterface $logger, SessionInterface $session)
+    public function fetchFlights(EntityManagerInterface $entityManager, SessionInterface $session)
     {
         $departure = $this->departure;
         $destination = $this->destination;
@@ -85,7 +84,6 @@ class SaveFlights extends AbstractController
                 'Priority' => 'u=1',
             ],
         ]);
-        // $logger->error($dateout->format('Y-m-d\TH:i:s.v'));
 
         if ($response->getStatusCode() === 200) {
             $data = $response->getContent();
@@ -118,12 +116,6 @@ class SaveFlights extends AbstractController
             sort($obj->trips[0]->dates);
             sort($obj->trips[1]->dates);
             
-
-
-            $logger->error(count($obj->trips[0]->dates[0]->flights));
-
-            // var_dump($obj);
-
             if (count($obj->trips[0]->dates[0]->flights) > 1 || count($obj->trips[1]->dates[0]->flights) > 1) {
                 // If there are multiple trips, render the selection page
                 $session->set('flights', $obj);
@@ -141,7 +133,7 @@ class SaveFlights extends AbstractController
     }
 
     #[LiveAction]
-    public function fetchFlight(EntityManagerInterface $entityManager, LoggerInterface $logger, SessionInterface $session)
+    public function fetchFlight(EntityManagerInterface $entityManager, SessionInterface $session)
     {
         $departure = $this->departure;
         $destination = $this->destination;
@@ -166,7 +158,6 @@ class SaveFlights extends AbstractController
                 'Priority' => 'u=1',
             ],
         ]);
-        // $logger->error($dateout->format('Y-m-d\TH:i:s.v'));
 
         if ($response->getStatusCode() === 200) {
             $data = $response->getContent();

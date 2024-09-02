@@ -9,14 +9,11 @@
         {{ form_widget(form.save) }}
         {% else %}
         {{ form_widget(form.save_oneway) }}  
-        {% endif %}
-        
-        
+        {% endif %}       
       </div>
       <button class="btn btn-outline-secondary" type="button" data-action="live#action" data-live-action-param="addDeparture" style="display: none;">
       </button>
       <button class="btn btn-outline-secondary" type="button" data-action="live#action" data-live-action-param="addDestination" style="display: none;">
       </button>
-
     </div>
 {% endif %}
