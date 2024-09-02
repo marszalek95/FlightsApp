@@ -10,7 +10,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Service\FlightsService;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -70,6 +72,17 @@ class FlightsController extends AbstractController
         ]);
     }
 
+    #[Route('/getFlights', name: 'get_flights')]
+    public function getFlights(Request $request): JsonResponse
+    {
+        $targetDate = new \DateTime($request->query->get('date'));
+        $departure = $request->query->get('departure');
+        $destination = $request->query->get('destination');
+        $flights = $this->flightService->searchFlight($departure, $destination, $targetDate);
+
+        return new JsonResponse($flights);
+    }
+
     #[Route('/addflight/search/{departure}/{destination}/{type}', name: 'app_addflight_result',)]
     public function addFlight(Request $request, $departure = null, $destination = null, $type = null): Response
     {   
@@ -83,6 +96,7 @@ class FlightsController extends AbstractController
 
         $form->handleRequest($request);
 
+
         if ($form->isSubmitted() && $form->isValid()) {
             $type = $form->getData()['type'];
             $departure = $form->getData()['departure'];
@@ -94,8 +108,6 @@ class FlightsController extends AbstractController
             $data = [
                 'form' => $form,
                 'saveform' => $saveform,
-                'data_departure' => $this->flightService->searchFlight($departure, $destination),
-                'data_return' => $this->flightService->searchFlight($destination, $departure),
                 'type' => $type,
                 'departure' => $departure,
                 'destination' => $destination
@@ -105,7 +117,6 @@ class FlightsController extends AbstractController
             $data = [
                 'form' => $form,
                 'saveform' => $saveform,
-                'data_departure' => $this->flightService->searchFlight($departure, $destination),
                 'type' => $type,
                 'departure' => $departure,
                 'destination' => $destination

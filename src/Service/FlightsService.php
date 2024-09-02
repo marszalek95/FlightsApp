@@ -8,20 +8,14 @@ use Symfony\Component\HttpClient\HttpClient;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Flight;
 use App\Entity\FlightPrices;
-
+use Exception;
 
 class FlightsService extends AbstractController
 {
 
-    public function searchFlight($departure, $destination)
+    public function searchFlight($departure, $destination, $targetDate)
     {   
-        $currentDate = new DateTime('first day of this month');
-
-        // Loop through the next 12 months
-        for ($i = 0; $i < 12; $i++) {
-            // Calculate the date for the current iteration
-            $targetDate = clone $currentDate;
-            $targetDate->modify("+$i months");
+        
 
             // Fetch data from the API
             $apiUrl = "https://www.ryanair.com/api/farfnd/v4/oneWayFares/{$departure}/{$destination}/cheapestPerDay?outboundMonthOfDate={$targetDate->format('Y-m-d')}&currency=PLN";
@@ -32,9 +26,7 @@ class FlightsService extends AbstractController
             $obj = json_decode($data);
 
             // Check if the request was successful (status code 200)
-            if ($response->getStatusCode() === 200) {
-                // Decode the JSON response
-                
+            if ($response->getStatusCode() === 200) {              
                 foreach($obj->outbound->fares as $fare) {
                     if($fare->unavailable == false) {
                         $arrivalTime =new DateTime($fare->arrivalDate);
@@ -49,17 +41,14 @@ class FlightsService extends AbstractController
                             'backgroundColor' => $this->getBackgroundColor($fare->price->value),
                             'overlap' => false,
                         );
-                    }
-                 
-                }
-
-                // Filter the data and merge with the existing results
-                
+                    }      
+                }                
             } else {
-                // Handle the case when the API request fails
-                // ...
+                throw new Exception('failed to get data from API');
             }
-        }
+            if (empty($data_callendar)) {
+                $data_callendar = [];
+            }
 
             // Return a response
             return json_encode($data_callendar);

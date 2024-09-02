@@ -31,7 +31,6 @@ class SearchController extends AbstractController
         return $this->render('flights/add_flight.html.twig', [
             'form' => $form,
             'saveform' => $saveform,
-            'data_departure' => null,
             'type' => null,
             'departure' => null,
             'destination' => null

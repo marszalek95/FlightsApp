@@ -4,4 +4,8 @@ controllers:
         namespace: App\Controller
     type: attribute
 
+events_fetch:
+    path: /events
+    controller: App\Controller\FlightsController::getFlights
+    methods: GET
 

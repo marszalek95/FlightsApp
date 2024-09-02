@@ -5,16 +5,13 @@
 {% block head %}
     {{ parent() }}
 
-    {% if data_departure %}
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js'></script>
-      
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>      
     <script>
-
+    {% if departure %}
     document.addEventListener('DOMContentLoaded', function() {
-      var events = {{ data_departure|raw }};
       var calendarEl = document.getElementById('calendarDepart');
-      var calendar = new FullCalendar.Calendar(calendarEl, {    
-          events: events,
+      var calendar = new FullCalendar.Calendar(calendarEl, {  
+          events: [],  // Set to an empty array to avoid fetching from /events  
           eventOrder: "eventProperty",
           height: 550,
           themeSystem: 'bootstrap5',
@@ -32,19 +29,37 @@
                 // Trigger the click event on the button to call the live action
                 button.click();
             }
+          },
+          datesSet: function (info) {
+            var dateCalendar = calendar.getDate();
+            date = dateCalendar.toLocaleDateString('en-CA');
+            fetchEvents(date);
           }
         });
         calendar.render();
+
+        function fetchEvents(date) {
+        // Fetch events from server
+           fetch(`/events?date=${date}&departure={{ departure }}&destination={{ destination }}`)
+              .then(response => response.json())
+              .then(response => {
+                  console.log(response);
+                  flights = JSON.parse(response);
+                  calendar.removeAllEvents(); // Remove all existing events
+                  calendar.addEventSource(flights); // Add new events
+              })
+              .catch(error => console.error('Error fetching events:', error));
+        }
     });
+    {% endif %}
 
 
 
-    {% if type == 'return' %}
+    {% if destination %}
     document.addEventListener('DOMContentLoaded', function() {
-      var events = {{ data_return|raw }};
       var calendarEl = document.getElementById('calendarReturn');
       var calendar = new FullCalendar.Calendar(calendarEl, {    
-          events: events,
+          events: [],  // Set to an empty array to avoid fetching from /events  
           eventOrder: "eventProperty",
           height: 550,
           themeSystem: 'bootstrap5',
@@ -62,14 +77,32 @@
                 // Trigger the click event on the button to call the live action
                 button.click();
             }
+          },
+          datesSet: function (info) {
+            var dateCalendar = calendar.getDate();
+            date = dateCalendar.toLocaleDateString('en-CA');
+            fetchEvents(date);
           }
         });
         calendar.render();
+
+        function fetchEvents(date) {
+        // Fetch events from server
+           fetch(`/events?date=${date}&departure={{ destination }}&destination={{ departure }}`)
+              .then(response => response.json())
+              .then(response => {
+                  console.log(response);
+                  flights = JSON.parse(response);
+                  calendar.removeAllEvents(); // Remove all existing events
+                  calendar.addEventSource(flights); // Add new events
+              })
+              .catch(error => console.error('Error fetching events:', error));
+        }
     });
     {% endif %}
     </script>
     
-    {% endif %}
+   
 
 
   
@@ -109,22 +142,23 @@
       
       
       
-      {% if data_departure %}
+      {% if departure %}
       <div class="row">       
           <!-- First Column (col-md-4 for medium and larger screens) -->
           <div class="col-md-4">
             <h4> Departure </h1>
             <div id='calendarDepart' data-action="live#action" data-live-action-param="addDeparture"></div>
           </div>
-          {% if type == 'return' %}
+          {% if destination %}
           <!-- Second Column (col-md-4 for medium and larger screens) -->
            <div class="col-md-4">
             <h4> Return </h1>
             <div id='calendarReturn' data-action="live#action" data-live-action-param="addDestination"></div>
           </div>
           {% endif %}
+      {% endif %}
 
-      {% endif %}      
+    
       </div>
     </main>
 </div>
