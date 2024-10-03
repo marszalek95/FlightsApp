@@ -3,40 +3,49 @@
 {% block title %}Log in!{% endblock %}
 
 {% block body %}
-    <form method="post">
-        {% if error %}
-            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-        {% endif %}
-
+    <form action="{{ path('app_login') }}" method="post">
+        
         {% if app.user %}
             <div class="mb-3">
                 You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
             </div>
         {% endif %}
 
-        <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-        <label for="username">Email</label>
-        <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus>
-        <label for="password">Password</label>
-        <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
-
-        <input type="hidden" name="_csrf_token"
-               value="{{ csrf_token('authenticate') }}"
-        >
-
-        {#
-            Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
-            See https://symfony.com/doc/current/security/remember_me.html
-
-            <div class="checkbox mb-3">
-                <label>
-                    <input type="checkbox" name="_remember_me"> Remember me
-                </label>
+        <div class="container col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-2">
+            {% if error %}
+                <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+            <div class="card-group px-md-4">
+              <!-- Login Card -->
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Login</h5>
+                  <form>
+                    <div class="form-group">
+                      <label for="email">Email address</label>
+                      <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus>
+                    </div>
+                    <div class="form-group">
+                      <label for="password">Password</label>
+                      <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
+                      <input type="hidden" name="_csrf_token"
+                            value="{{ csrf_token('authenticate') }}"
+                        >
+                    </div>
+                    <button button class="btn btn-primary mt-2" type="submit">Login</button>
+                    <p class="text-center mt-3">Don't have an account? <a href="/register">Sign up</a></p>
+                  </form>
+                </div>
+              </div>
+              <!-- Description Card -->
+              <div class="card description-card">
+                <div class="card-body">
+                  <h5 class="card-title">Welcome Flightsapp</h5>
+                  <p class="card-text">FlightsApp makes it easy to find and track Ryanair flights with a user-friendly calendar that displays prices at a glance. Save your favorite flights and monitor fare changes effortlessly.</p>
+                  <p class="card-text">If you're new here, create an account to get started!</p>
+                </div>
+              </div>
             </div>
-        #}
-
-        <button class="btn btn-lg btn-primary" type="submit">
-            Sign in
-        </button>
+          </div>
     </form>
 {% endblock %}
