@@ -41,6 +41,9 @@ class Flight
     #[ORM\Column]
     private ?int $user_id = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $flight_key = null;
+
 
     public function getId(): ?int
     {
@@ -151,6 +154,18 @@ class Flight
     public function setUserId(int $user_id): static
     {
         $this->user_id = $user_id;
+
+        return $this;
+    }
+
+    public function getFlightKey(): ?string
+    {
+        return $this->flight_key;
+    }
+
+    public function setFlightKey(string $flight_key): static
+    {
+        $this->flight_key = $flight_key;
 
         return $this;
     }

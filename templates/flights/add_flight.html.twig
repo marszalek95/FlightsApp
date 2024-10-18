@@ -7,7 +7,7 @@
 
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>      
     <script>
-    {% if departure %}
+    {% if type == 'oneWay' or type == 'return' %}
     document.addEventListener('DOMContentLoaded', function() {
       var calendarEl = document.getElementById('calendarDepart');
       var calendar = new FullCalendar.Calendar(calendarEl, {  
@@ -52,7 +52,7 @@
     });
     {% endif %}
 
-    {% if destination %}
+    {% if type == 'return' %}
     document.addEventListener('DOMContentLoaded', function() {
       var calendarEl = document.getElementById('calendarReturn');
       var calendar = new FullCalendar.Calendar(calendarEl, {    
@@ -103,15 +103,16 @@
 {% block body %}
   
 <div class="container-fluid mt-2">
+  <div class="row">
     {% include 'sidebar.html.twig' %}
-    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div class="col-xl-10 ms-auto">
       {% for message in app.flashes('success') %}
         <div class="alert alert-success">
             {{ message }}
         </div>
     {% endfor %}
       <h4>Flight Search</h1>
-      <div class="row">
+      <div class="row content-container">
         {{ component('SearchFlights', {
           form: form
       }) }}
@@ -121,24 +122,19 @@
         type: type,
         departure: departure,
         destination: destination,
-      }) }}
-
-            
-          
+      }) }}  
       </div>
-      
-      
-      
-      {% if departure %}
-      <div class="row">       
+        
+      {% if type == 'oneWay' or type == 'return' %}
+      <div class="row content-container">       
           <!-- First Column -->
-          <div class="col-md-4">
+          <div class="col-xl">
             <h4> Departure </h1>
             <div id='calendarDepart' data-action="live#action" data-live-action-param="addDeparture"></div>
           </div>
-          {% if destination %}
+          {% if type == 'return' %}
           <!-- Second Column -->
-           <div class="col-md-4">
+           <div class="col-xl">
             <h4> Return </h1>
             <div id='calendarReturn' data-action="live#action" data-live-action-param="addDestination"></div>
           </div>
@@ -146,7 +142,8 @@
       {% endif %}
        
       </div>
-    </main>
+    </div>
+  </div>
 </div>
 
 {% endblock %}

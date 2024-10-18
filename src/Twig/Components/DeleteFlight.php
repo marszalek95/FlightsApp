@@ -31,9 +31,9 @@ class DeleteFlight extends AbstractController
             $entityManager->remove($price);
         }
 
-        if (isset($flight->return_flight)) {
-            $flightReturn = $entityManager->getRepository(Flight::class)->find($flight->return_flight);
-            $pricesReturn = $entityManager->getRepository(FlightPrices::class)->findby(['flight_id' => $flight->return_flight]);
+        if (null !== ($flight->getReturnFlight())) {
+            $flightReturn = $entityManager->getRepository(Flight::class)->find($flight->getReturnFlight());
+            $pricesReturn = $entityManager->getRepository(FlightPrices::class)->findby(['flight_id' => $flight->getReturnFlight()]);
             $entityManager->remove($flightReturn);
 
             foreach ($pricesReturn as $priceReturn) {

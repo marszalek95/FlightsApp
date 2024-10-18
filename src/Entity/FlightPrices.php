@@ -17,9 +17,6 @@ class FlightPrices
     #[ORM\Column(nullable: true)]
     private ?int $flight_id = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $price = null;
-
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $recorded_at = null;
 
@@ -28,6 +25,9 @@ class FlightPrices
 
     #[ORM\Column]
     private ?int $user_id = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $price = null;
 
     public function getId(): ?int
     {
@@ -49,18 +49,6 @@ class FlightPrices
     public function setFlightId(?int $flight_id): static
     {
         $this->flight_id = $flight_id;
-
-        return $this;
-    }
-
-    public function getPrice(): ?int
-    {
-        return $this->price;
-    }
-
-    public function setPrice(?int $price): static
-    {
-        $this->price = $price;
 
         return $this;
     }
@@ -97,6 +85,18 @@ class FlightPrices
     public function setUserId(int $user_id): static
     {
         $this->user_id = $user_id;
+
+        return $this;
+    }
+
+    public function getPrice(): ?float
+    {
+        return $this->price;
+    }
+
+    public function setPrice(?float $price): static
+    {
+        $this->price = $price;
 
         return $this;
     }

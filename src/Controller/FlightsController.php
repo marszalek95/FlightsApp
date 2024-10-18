@@ -36,25 +36,22 @@ class FlightsController extends AbstractController
         $flightsData = [];
 
         foreach ($flights as $flight) {
-            // Ensure the return flight exists and hasn't already been processed
+            // Ensure the return flight hasn't already been processed
             if (in_array($flight->getId(), $processedReturnFlights)) {
                 continue;
             }
-    
+            // Check if this flight has a return flight
             if ($flight->getReturnFlight()) {
                 $returnFlight = $entityManager->getRepository(Flight::class)->find($flight->getReturnFlight());
-                // Check if this flight has a return flight
-                if ($returnFlight && !in_array($returnFlight->getId(), $processedReturnFlights)) {
-                    $flightsData[] = [
-                        'flight' => $flight,
-                        'returnFlight' => $returnFlight,
-                        'prices' => $entityManager->getRepository(FlightPrices::class)->findBy(['flight_id' => $flight->getId()],['recorded_at' => 'ASC']),
-                        'returnPrices' => $entityManager->getRepository(FlightPrices::class)->findBy(['flight_id' => $returnFlight->getId()],['recorded_at' => 'ASC']),
-                    ];
-    
-                    // Mark the return flight as processed
-                    $processedReturnFlights[] = $returnFlight->getId();
-                }
+                $flightsData[] = [
+                    'flight' => $flight,
+                    'returnFlight' => $returnFlight,
+                    'prices' => $entityManager->getRepository(FlightPrices::class)->findBy(['flight_id' => $flight->getId()],['recorded_at' => 'ASC']),
+                    'returnPrices' => $entityManager->getRepository(FlightPrices::class)->findBy(['flight_id' => $returnFlight->getId()],['recorded_at' => 'ASC']),
+                ];
+                // Mark the return flight as processed
+                $processedReturnFlights[] = $returnFlight->getId();
+                
             } else {
                 $flightsData[] = [
                     'flight' => $flight,

@@ -120,6 +120,10 @@ svg.bi {
   display: inline-block;
 }
 
+.content-container {
+  max-width: 1200px;
+}
+
 canvas {
   width: 100% !important;
   height: 200px !important; /* Maintain aspect ratio */

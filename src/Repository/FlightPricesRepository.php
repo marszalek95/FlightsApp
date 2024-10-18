@@ -35,14 +35,18 @@ class FlightPricesRepository extends ServiceEntityRepository
 //            ->getResult()
 //        ;
 //    }
+   
 
-//    public function findOneBySomeField($value): ?FlightPrices
-//    {
-//        return $this->createQueryBuilder('f')
-//            ->andWhere('f.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+   public function findPrice(int $flightId): ?FlightPrices
+   {
+        $qb = $this->createQueryBuilder('fp')
+        ->where('fp.flight_id = :flight_id')
+            ->setParameter('flight_id', $flightId)
+            ->orderBy('fp.recorded_at', 'DESC') 
+            ->setMaxResults(1);
+
+        $query = $qb->getQuery()->getOneOrNullResult();
+
+        return $query;
+   }
 }
